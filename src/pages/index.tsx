@@ -8,14 +8,7 @@ import {
   useControllableState,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import {
-  startOfDay,
-  format,
-  add,
-  eachWeekOfInterval,
-  isThursday,
-  nextThursday,
-} from 'date-fns';
+import { startOfDay, format, add, eachWeekOfInterval } from 'date-fns';
 import React from 'react';
 
 import useSWR from 'swr';
@@ -38,8 +31,12 @@ const IndexPage = () => {
     { weekStartsOn: 4 },
   );
 
-  const [selectedDate, setDate] = useControllableState({
-    defaultValue: ((isThursday(now) && now) || nextThursday(now)).toISOString(),
+  // TODO: this would be clever, but not working for the Select element value?
+  // const [selectedDate, setDate] = useControllableState({
+  //   defaultValue: ((isThursday(now) && now) || nextThursday(now)).toISOString(),
+  // });
+  const [selectedDate, setDate] = useControllableState<string>({
+    defaultValue: allThursdays[0].toISOString(),
   });
 
   const { data, error } = useSWR<{
