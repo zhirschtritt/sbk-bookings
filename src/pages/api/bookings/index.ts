@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import urljoin from 'url-join';
 import { format, getDayOfYear } from 'date-fns';
@@ -87,10 +87,3 @@ export default async function handler(
     cancelled: bookingsForDate.filter((b) => b.cancelled),
   });
 }
-
-// type enforcement
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const handlerCheck: NextApiHandler<{
-  bookings: Booking[];
-  cancelled: Booking[];
-}> = handler;
