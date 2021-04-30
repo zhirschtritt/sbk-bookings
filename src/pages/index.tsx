@@ -1,17 +1,18 @@
 import {
-  Box,
   Center,
   CircularProgress,
   Text,
   Container,
   Select,
   VStack,
+  useControllableState,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import { startOfDay, format } from 'date-fns';
+import { startOfDay, format, add, eachWeekOfInterval } from 'date-fns';
 import React from 'react';
 
 import useSWR from 'swr';
+import { BookingsList } from '../components/BookingsList';
 import { Booking } from '../interfaces/YCBMBookingDto';
 
 const fetcher = async (url: string) => {
@@ -20,10 +21,22 @@ const fetcher = async (url: string) => {
 };
 
 const IndexPage = () => {
+  const allThursdays = eachWeekOfInterval(
+    {
+      start: new Date(),
+      end: add(new Date(), { weeks: 4 }),
+    },
+    { weekStartsOn: 4 },
+  );
+
+  const [selectedDate, setDate] = useControllableState({
+    defaultValue: allThursdays[1].toISOString(),
+  });
+
   const { data, error } = useSWR<{
     bookings: Booking[];
     cancelled: Booking[];
-  }>('/api/bookings', fetcher);
+  }>(`/api/bookings/?date=${selectedDate}`, fetcher);
 
   if (error) {
     throw new Error(error);
@@ -31,10 +44,15 @@ const IndexPage = () => {
 
   return (
     <VStack spacing={1} align="stretch">
-      <Select>
-        <option value="1">
-          {format(startOfDay(new Date()), 'EEEE - LLL d, y')}
-        </option>
+      <Select
+        value={selectedDate}
+        onChange={(props) => setDate(props.target.value)}
+      >
+        {allThursdays.map((date) => (
+          <option key={date.getTime()} value={date.toISOString()}>
+            {format(startOfDay(date), 'EEEE - LLL d, y')}
+          </option>
+        ))}
       </Select>
       {!data?.bookings ? (
         <Center>
@@ -44,62 +62,18 @@ const IndexPage = () => {
         <VStack align="stretch" width="full" padding="5px">
           <Center>
             <Container p="2" border="1px" borderRadius="md">
-              <VStack align="stretch">
-                <Text fontSize="lg" color="green.500">
-                  Booked
-                </Text>
-                {data.bookings.map((booking) => (
-                  <Box
-                    key={booking.id}
-                    h="full"
-                    p="2"
-                    border="1px"
-                    borderRadius="md"
-                  >
-                    <VStack>
-                      <Text>{`${booking.firstName} ${booking.lastName}`}</Text>
-                      <Text>
-                        {format(new Date(booking.startsAt), 'hh:mm aa')}
-                      </Text>
-                      <Text>{booking.duration}</Text>
-                      <Text>{booking.email}</Text>
-                      <Text>
-                        Cancelled: {booking.cancelled ? 'true' : 'false'}
-                      </Text>
-                    </VStack>
-                  </Box>
-                ))}
-              </VStack>
+              <Text fontSize="lg" color="green.500">
+                Booked
+              </Text>
+              <BookingsList bookings={data.bookings} />
             </Container>
           </Center>
           <Center>
             <Container p="2" border="1px" borderRadius="md">
-              <VStack align="stretch">
-                <Text fontSize="lg" color="red.500">
-                  Cancelled
-                </Text>
-                {data.cancelled.map((booking) => (
-                  <Box
-                    key={booking.id}
-                    h="full"
-                    p="2"
-                    border="1px"
-                    borderRadius="md"
-                  >
-                    <VStack>
-                      <Text>{`${booking.firstName} ${booking.lastName}`}</Text>
-                      <Text>
-                        {format(new Date(booking.startsAt), 'hh:mm aa')}
-                      </Text>
-                      <Text>{booking.duration}</Text>
-                      <Text>{booking.email}</Text>
-                      <Text>
-                        Cancelled: {booking.cancelled ? 'true' : 'false'}
-                      </Text>
-                    </VStack>
-                  </Box>
-                ))}
-              </VStack>
+              <Text fontSize="lg" color="red.500">
+                Cancelled
+              </Text>
+              <BookingsList bookings={data.cancelled} />
             </Container>
           </Center>
         </VStack>

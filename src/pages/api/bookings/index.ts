@@ -2,7 +2,7 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import urljoin from 'url-join';
-import { isToday } from 'date-fns';
+import { getDayOfYear } from 'date-fns';
 import {
   AnswerCode,
   AnswerKey,
@@ -66,7 +66,7 @@ const ycbmAxios = axios.create({
 });
 
 export default async function handler(
-  req: NextApiRequest,
+  { query: { date } }: NextApiRequest,
   res: NextApiResponse,
 ) {
   const { data: bookings } = await ycbmAxios.get<YCMBBookingDto[]>(bookingsUrl);
@@ -74,7 +74,10 @@ export default async function handler(
   // filter by date in req
   const bookingsForDate = bookings
     .map(ycmbBookingToBooking)
-    .filter((b) => isToday(b.startsAt));
+    .filter(
+      (b) =>
+        getDayOfYear(b.startsAt) === getDayOfYear(new Date(date as string)),
+    );
 
   res.status(200);
   res.json({
