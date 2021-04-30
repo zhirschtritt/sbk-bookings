@@ -36,11 +36,13 @@ const IndexPage = () => {
           {format(startOfDay(new Date()), 'EEEE - LLL d, y')}
         </option>
       </Select>
-      <Center>
-        {!data?.bookings ? (
+      {!data?.bookings ? (
+        <Center>
           <CircularProgress />
-        ) : (
-          <VStack align="stretch" width="full" padding="5px">
+        </Center>
+      ) : (
+        <VStack align="stretch" width="full" padding="5px">
+          <Center>
             <Container p="2" border="1px" borderRadius="md">
               <VStack align="stretch">
                 <Text fontSize="lg" color="green.500">
@@ -69,6 +71,8 @@ const IndexPage = () => {
                 ))}
               </VStack>
             </Container>
+          </Center>
+          <Center>
             <Container p="2" border="1px" borderRadius="md">
               <VStack align="stretch">
                 <Text fontSize="lg" color="red.500">
@@ -97,9 +101,9 @@ const IndexPage = () => {
                 ))}
               </VStack>
             </Container>
-          </VStack>
-        )}
-      </Center>
+          </Center>
+        </VStack>
+      )}
     </VStack>
   );
 };
