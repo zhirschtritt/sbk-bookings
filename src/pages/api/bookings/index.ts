@@ -2,7 +2,7 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import urljoin from 'url-join';
-import { getDayOfYear } from 'date-fns';
+import { format, getDayOfYear } from 'date-fns';
 import {
   AnswerCode,
   AnswerKey,
@@ -54,11 +54,6 @@ const bookingsUrl = urljoin(
 );
 
 const ycbmAxios = axios.create({
-  params: {
-    fields:
-      'startsAt,endsAt,createdAt,displayDurationShort,displayDurationFull,answers,answers.code,answers.string' +
-      ',cancelled,id,title',
-  },
   auth: {
     username,
     password: apiKey,
@@ -66,18 +61,25 @@ const ycbmAxios = axios.create({
 });
 
 export default async function handler(
-  { query: { date } }: NextApiRequest,
+  { query: { date } }: NextApiRequest & { query: { date: string } },
   res: NextApiResponse,
 ) {
-  const { data: bookings } = await ycbmAxios.get<YCMBBookingDto[]>(bookingsUrl);
+  const { data: bookings } = await ycbmAxios.get<YCMBBookingDto[]>(
+    bookingsUrl,
+    {
+      params: {
+        jumpToDate: format(new Date(date), 'yyyy-LL-dd'),
+        fields:
+          'startsAt,endsAt,createdAt,displayDurationShort,displayDurationFull,answers,answers.code,answers.string' +
+          ',cancelled,id,title',
+      },
+    },
+  );
 
   // filter by date in req
   const bookingsForDate = bookings
     .map(ycmbBookingToBooking)
-    .filter(
-      (b) =>
-        getDayOfYear(b.startsAt) === getDayOfYear(new Date(date as string)),
-    );
+    .filter((b) => getDayOfYear(b.startsAt) === getDayOfYear(new Date(date)));
 
   res.status(200);
   res.json({

@@ -16,6 +16,9 @@ export function BookingsList({ bookings }: { bookings: Booking[] }) {
               {format(new Date(booking.startsAt), 'hh:mm aa')} -{' '}
               {booking.duration}
             </Text>
+            <Text color="gray.500" fontSize="sm">
+              {booking.todo}
+            </Text>
           </VStack>
         </Box>
       ))}
