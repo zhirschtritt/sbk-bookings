@@ -32,7 +32,9 @@ const IndexPage = () => {
   return (
     <VStack spacing={1} align="stretch">
       <Select>
-        <option value="1">{format(startOfDay(new Date()), 'LLL d, y')}</option>
+        <option value="1">
+          {format(startOfDay(new Date()), 'EEEE - LLL d, y')}
+        </option>
       </Select>
       <Center>
         {!data?.bookings ? (
@@ -54,7 +56,9 @@ const IndexPage = () => {
                   >
                     <VStack>
                       <Text>{`${booking.firstName} ${booking.lastName}`}</Text>
-                      <Text>{booking.startsAt}</Text>
+                      <Text>
+                        {format(new Date(booking.startsAt), 'hh:mm aa')}
+                      </Text>
                       <Text>{booking.duration}</Text>
                       <Text>{booking.email}</Text>
                       <Text>
@@ -80,7 +84,9 @@ const IndexPage = () => {
                   >
                     <VStack>
                       <Text>{`${booking.firstName} ${booking.lastName}`}</Text>
-                      <Text>{booking.startsAt}</Text>
+                      <Text>
+                        {format(new Date(booking.startsAt), 'hh:mm aa')}
+                      </Text>
                       <Text>{booking.duration}</Text>
                       <Text>{booking.email}</Text>
                       <Text>
