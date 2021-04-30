@@ -6,6 +6,7 @@ import { isToday } from 'date-fns';
 import {
   AnswerCode,
   AnswerKey,
+  answerKeyToCode,
   Booking,
   YCMBBookingDto,
 } from '../../../interfaces/YCBMBookingDto';
@@ -34,11 +35,11 @@ function ycmbBookingToBooking(ycmbBooking: YCMBBookingDto): Booking {
     endsAt: new Date(ycmbBooking.endsAt),
     cancelled: ycmbBooking.cancelled,
     title: ycmbBooking.title,
-    email: answers.get('EMAIL')!,
-    phone: answers.get('Q7')!,
-    lastName: answers.get('LNAME')!,
-    firstName: answers.get('FNAME')!,
-    todo: answers.get('Q5')!,
+    email: answers.get(answerKeyToCode.email)!,
+    phone: answers.get(answerKeyToCode.phone)!,
+    lastName: answers.get(answerKeyToCode.lastName)!,
+    firstName: answers.get(answerKeyToCode.firstName)!,
+    todo: answers.get(answerKeyToCode.todo)!,
     duration: ycmbBooking.displayDurationFull,
   };
 }
@@ -71,15 +72,20 @@ export default async function handler(
   const { data: bookings } = await ycbmAxios.get<YCMBBookingDto[]>(bookingsUrl);
 
   // filter by date in req
+  const bookingsForDate = bookings
+    .map(ycmbBookingToBooking)
+    .filter((b) => isToday(b.startsAt));
 
   res.status(200);
-  res.json(
-    bookings
-      .map(ycmbBookingToBooking)
-      .filter((b) => isToday(b.startsAt) && !b.cancelled),
-  );
+  res.json({
+    bookings: bookingsForDate.filter((b) => !b.cancelled),
+    cancelled: bookingsForDate.filter((b) => b.cancelled),
+  });
 }
 
 // type enforcement
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const handlerCheck: NextApiHandler<Booking[]> = handler;
+const handlerCheck: NextApiHandler<{
+  bookings: Booking[];
+  cancelled: Booking[];
+}> = handler;

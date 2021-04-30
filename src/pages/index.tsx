@@ -20,7 +20,10 @@ const fetcher = async (url: string) => {
 };
 
 const IndexPage = () => {
-  const { data: bookings, error } = useSWR<Booking[]>('/api/bookings', fetcher);
+  const { data, error } = useSWR<{
+    bookings: Booking[];
+    cancelled: Booking[];
+  }>('/api/bookings', fetcher);
 
   if (error) {
     throw new Error(error);
@@ -32,32 +35,63 @@ const IndexPage = () => {
         <option value="1">{format(startOfDay(new Date()), 'LLL d, y')}</option>
       </Select>
       <Center>
-        {!bookings ? (
+        {!data?.bookings ? (
           <CircularProgress />
         ) : (
-          <Container p="2">
-            <VStack align="stretch">
-              {bookings.map((booking) => (
-                <Box
-                  key={booking.id}
-                  h="full"
-                  p="2"
-                  border="1px"
-                  borderRadius="md"
-                >
-                  <VStack>
-                    <Text>{`${booking.firstName} ${booking.lastName}`}</Text>
-                    <Text>{booking.startsAt}</Text>
-                    <Text>{booking.duration}</Text>
-                    <Text>{booking.email}</Text>
-                    <Text>
-                      Cancelled: {booking.cancelled ? 'true' : 'false'}
-                    </Text>
-                  </VStack>
-                </Box>
-              ))}
-            </VStack>
-          </Container>
+          <VStack align="stretch" width="full" padding="5px">
+            <Container p="2" border="1px" borderRadius="md">
+              <VStack align="stretch">
+                <Text fontSize="lg" color="green.500">
+                  Booked
+                </Text>
+                {data.bookings.map((booking) => (
+                  <Box
+                    key={booking.id}
+                    h="full"
+                    p="2"
+                    border="1px"
+                    borderRadius="md"
+                  >
+                    <VStack>
+                      <Text>{`${booking.firstName} ${booking.lastName}`}</Text>
+                      <Text>{booking.startsAt}</Text>
+                      <Text>{booking.duration}</Text>
+                      <Text>{booking.email}</Text>
+                      <Text>
+                        Cancelled: {booking.cancelled ? 'true' : 'false'}
+                      </Text>
+                    </VStack>
+                  </Box>
+                ))}
+              </VStack>
+            </Container>
+            <Container p="2" border="1px" borderRadius="md">
+              <VStack align="stretch">
+                <Text fontSize="lg" color="red.500">
+                  Cancelled
+                </Text>
+                {data.cancelled.map((booking) => (
+                  <Box
+                    key={booking.id}
+                    h="full"
+                    p="2"
+                    border="1px"
+                    borderRadius="md"
+                  >
+                    <VStack>
+                      <Text>{`${booking.firstName} ${booking.lastName}`}</Text>
+                      <Text>{booking.startsAt}</Text>
+                      <Text>{booking.duration}</Text>
+                      <Text>{booking.email}</Text>
+                      <Text>
+                        Cancelled: {booking.cancelled ? 'true' : 'false'}
+                      </Text>
+                    </VStack>
+                  </Box>
+                ))}
+              </VStack>
+            </Container>
+          </VStack>
         )}
       </Center>
     </VStack>

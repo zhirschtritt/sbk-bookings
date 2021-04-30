@@ -33,10 +33,10 @@ export type AnswerKey = keyof Pick<
   'firstName' | 'lastName' | 'email' | 'phone' | 'todo'
 >;
 
-export const AnswerCodeToKey: Record<AnswerCode, AnswerKey> = {
-  FNAME: 'firstName',
-  LNAME: 'lastName',
-  EMAIL: 'email',
-  Q7: 'phone',
-  Q5: 'todo',
+export const answerKeyToCode: Record<AnswerKey, AnswerCode> = {
+  firstName: 'FNAME',
+  lastName: 'LNAME',
+  email: 'EMAIL',
+  phone: 'Q7',
+  todo: 'Q5',
 } as const;
