@@ -8,7 +8,14 @@ import {
   useControllableState,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import { startOfDay, format, add, eachWeekOfInterval } from 'date-fns';
+import {
+  startOfDay,
+  format,
+  add,
+  eachWeekOfInterval,
+  isThursday,
+  nextThursday,
+} from 'date-fns';
 import React from 'react';
 
 import useSWR from 'swr';
@@ -21,16 +28,18 @@ const fetcher = async (url: string) => {
 };
 
 const IndexPage = () => {
+  const now = new Date();
+
   const allThursdays = eachWeekOfInterval(
     {
-      start: new Date(),
-      end: add(new Date(), { weeks: 4 }),
+      start: now,
+      end: add(now, { weeks: 4 }),
     },
     { weekStartsOn: 4 },
   );
 
   const [selectedDate, setDate] = useControllableState({
-    defaultValue: allThursdays[1].toISOString(),
+    defaultValue: ((isThursday(now) && now) || nextThursday(now)).toISOString(),
   });
 
   const { data, error } = useSWR<{
