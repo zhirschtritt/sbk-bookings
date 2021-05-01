@@ -6,9 +6,17 @@ import {
   Select,
   VStack,
   useControllableState,
+  Skeleton,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import { startOfDay, format, add, eachWeekOfInterval } from 'date-fns';
+import {
+  startOfDay,
+  format,
+  add,
+  eachWeekOfInterval,
+  isThursday,
+  nextThursday,
+} from 'date-fns';
 import React from 'react';
 
 import useSWR from 'swr';
@@ -21,7 +29,7 @@ const fetcher = async (url: string) => {
 };
 
 const IndexPage = () => {
-  const now = new Date();
+  const now = startOfDay(new Date());
 
   const allThursdays = eachWeekOfInterval(
     {
@@ -31,12 +39,8 @@ const IndexPage = () => {
     { weekStartsOn: 4 },
   );
 
-  // TODO: this would be clever, but not working for the Select element value?
-  // const [selectedDate, setDate] = useControllableState({
-  //   defaultValue: ((isThursday(now) && now) || nextThursday(now)).toISOString(),
-  // });
-  const [selectedDate, setDate] = useControllableState<string>({
-    defaultValue: allThursdays[0].toISOString(),
+  const [selectedDate, setDate] = useControllableState({
+    defaultValue: ((isThursday(now) && now) || nextThursday(now)).toISOString(),
   });
 
   const { data, error } = useSWR<{
@@ -60,30 +64,28 @@ const IndexPage = () => {
           </option>
         ))}
       </Select>
-      {!data?.bookings ? (
-        <Center>
-          <CircularProgress />
-        </Center>
-      ) : (
-        <VStack align="stretch" width="full" padding="5px">
+      <VStack align="stretch" width="full" padding="5px">
+        <Skeleton isLoaded={!!data}>
           <Center>
             <Container p="2" border="1px" borderRadius="md">
               <Text fontSize="lg" color="green.500">
                 Booked
               </Text>
-              <BookingsList bookings={data.bookings} />
+              <BookingsList bookings={data?.bookings || []} />
             </Container>
           </Center>
+        </Skeleton>
+        <Skeleton isLoaded={!!data}>
           <Center>
             <Container p="2" border="1px" borderRadius="md">
               <Text fontSize="lg" color="red.500">
                 Cancelled
               </Text>
-              <BookingsList bookings={data.cancelled} />
+              <BookingsList bookings={data?.cancelled || []} />
             </Container>
           </Center>
-        </VStack>
-      )}
+        </Skeleton>
+      </VStack>
     </VStack>
   );
 };
