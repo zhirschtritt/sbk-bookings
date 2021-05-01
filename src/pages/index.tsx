@@ -1,6 +1,5 @@
 import {
   Center,
-  CircularProgress,
   Text,
   Container,
   Select,
