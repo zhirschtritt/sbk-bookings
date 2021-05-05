@@ -1,25 +1,24 @@
 import {
   Center,
-  Text,
   Container,
   Select,
-  VStack,
-  useControllableState,
-  Skeleton,
   Progress,
+  useControllableState,
+  VStack,
+  Text,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import {
-  startOfDay,
-  format,
   add,
   eachWeekOfInterval,
+  format,
   isThursday,
   nextThursday,
+  startOfDay,
 } from 'date-fns';
 import React from 'react';
-
 import useSWR from 'swr';
+
 import { BookingsList } from '../components/BookingsList';
 import { Booking } from '../interfaces/YCBMBookingDto';
 
@@ -40,7 +39,7 @@ const IndexPage = () => {
   );
 
   const [selectedDate, setDate] = useControllableState({
-    defaultValue: ((isThursday(now) && now) || nextThursday(now)).toISOString(),
+    defaultValue: (isThursday(now) ? now : nextThursday(now)).toISOString(),
   });
 
   const { data, error } = useSWR<{
