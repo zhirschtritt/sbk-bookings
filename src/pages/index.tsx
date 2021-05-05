@@ -6,6 +6,7 @@ import {
   VStack,
   useControllableState,
   Skeleton,
+  Progress,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import {
@@ -52,39 +53,51 @@ const IndexPage = () => {
   }
 
   return (
-    <VStack spacing={1} align="stretch">
-      <Select
-        value={selectedDate}
-        onChange={(props) => setDate(props.target.value)}
-      >
-        {allThursdays.map((date) => (
-          <option key={date.getTime()} value={date.toISOString()}>
-            {format(startOfDay(date), 'EEEE - LLL d, y')}
-          </option>
-        ))}
-      </Select>
-      <VStack align="stretch" width="full" padding="5px">
-        <Skeleton isLoaded={!!data}>
+    <VStack spacing={1} align="stretch" paddingX="1">
+      <Center>
+        <Select
+          variant="flushed"
+          paddingTop="1"
+          value={selectedDate}
+          onChange={(props) => setDate(props.target.value)}
+          maxW="container.md"
+        >
+          {allThursdays.map((date) => (
+            <option key={date.getTime()} value={date.toISOString()}>
+              {format(startOfDay(date), 'EEEE - LLL d, y')}
+            </option>
+          ))}
+        </Select>
+      </Center>
+      {!data ? (
+        <Progress size="md" isIndeterminate margin="5" />
+      ) : (
+        <VStack align="stretch" width="full">
           <Center>
-            <Container p="2" border="1px" borderRadius="md">
+            <Container p="2" maxW="container.md">
               <Text fontSize="lg" color="green.500">
                 Booked
               </Text>
-              <BookingsList bookings={data?.bookings || []} />
+              <BookingsList bookings={data?.bookings || []} color="green.500" />
             </Container>
           </Center>
-        </Skeleton>
-        <Skeleton isLoaded={!!data}>
           <Center>
-            <Container p="2" border="1px" borderRadius="md">
-              <Text fontSize="lg" color="red.500">
-                Cancelled
-              </Text>
-              <BookingsList bookings={data?.cancelled || []} />
-            </Container>
+            {data?.cancelled.length ? (
+              <Container p="2" maxW="container.md">
+                <Text fontSize="lg" color="red.500">
+                  Cancelled
+                </Text>
+                <BookingsList
+                  bookings={data?.cancelled || []}
+                  color="red.500"
+                />
+              </Container>
+            ) : (
+              <></>
+            )}
           </Center>
-        </Skeleton>
-      </VStack>
+        </VStack>
+      )}
     </VStack>
   );
 };
