@@ -1,7 +1,8 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
+import { AppProps } from 'next/app';
 import { ChakraProvider } from '@chakra-ui/react';
 
-function MyApp({ pageProps, Component }: PropsWithChildren<any>) {
+function MyApp({ pageProps, Component }: AppProps) {
   return (
     <ChakraProvider>
       <Component {...pageProps} />

@@ -6,10 +6,10 @@ import { format, getDayOfYear } from 'date-fns';
 import {
   AnswerCode,
   AnswerKey,
-  answerKeyToCode,
+  answerCodeToKey,
   Booking,
   YCMBBookingDto,
-} from '../../../interfaces/YCBMBookingDto';
+} from '../../../interfaces/Bookings';
 
 const accountId = process.env.YCMB_ACCOUNT_ID;
 const profileId = process.env.YCMB_PROFILE_ID;
@@ -20,27 +20,27 @@ if (!accountId || !profileId || !username || !apiKey) {
   throw new Error('Missing required YCMB account keys');
 }
 
-function ycmbBookingToBooking(ycmbBooking: YCMBBookingDto): Booking {
-  const answers: ReadonlyMap<AnswerCode, AnswerKey> = new Map(
-    ycmbBooking.answers.map(({ code, string }) => [
-      code as AnswerCode,
-      string as AnswerKey,
+function ycmbBookingToBooking(ycbmBooking: YCMBBookingDto): Booking {
+  const answers: ReadonlyMap<AnswerKey, string> = new Map(
+    ycbmBooking.answers.map(({ code, string }) => [
+      answerCodeToKey[code as AnswerCode],
+      string,
     ]),
   );
 
   return {
-    id: ycmbBooking.id,
-    createdAt: new Date(ycmbBooking.createdAt),
-    startsAt: new Date(ycmbBooking.startsAt),
-    endsAt: new Date(ycmbBooking.endsAt),
-    cancelled: ycmbBooking.cancelled,
-    title: ycmbBooking.title,
-    email: answers.get(answerKeyToCode.email)!,
-    phone: answers.get(answerKeyToCode.phone)!,
-    lastName: answers.get(answerKeyToCode.lastName)!,
-    firstName: answers.get(answerKeyToCode.firstName)!,
-    todo: answers.get(answerKeyToCode.todo)!,
-    duration: ycmbBooking.displayDurationFull,
+    id: ycbmBooking.id,
+    createdAt: new Date(ycbmBooking.createdAt),
+    startsAt: new Date(ycbmBooking.startsAt),
+    endsAt: new Date(ycbmBooking.endsAt),
+    cancelled: ycbmBooking.cancelled,
+    title: ycbmBooking.title,
+    email: answers.get('email')!,
+    phone: answers.get('phone')!,
+    lastName: answers.get('lastName')!,
+    firstName: answers.get('firstName')!,
+    todo: answers.get('todo')!,
+    duration: ycbmBooking.displayDurationFull,
   };
 }
 

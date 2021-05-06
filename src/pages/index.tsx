@@ -21,7 +21,7 @@ import React from 'react';
 import useSWR from 'swr';
 
 import { BookingsList } from '../components/BookingsList';
-import { Booking } from '../interfaces/YCBMBookingDto';
+import { Booking } from '../interfaces/Bookings';
 
 const fetcher = async (url: string) => {
   const res = await axios.get(url);
@@ -46,7 +46,9 @@ const IndexPage = () => {
   const { data, error } = useSWR<{
     bookings: Booking[];
     cancelled: Booking[];
-  }>(`/api/bookings/?date=${selectedDate}`, fetcher);
+  }>(`/api/bookings/?date=${selectedDate}`, fetcher, {
+    refreshInterval: 5 * 60 * 1000, // 5 minutes
+  });
 
   if (error) {
     throw new Error(error);

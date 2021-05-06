@@ -1,7 +1,7 @@
 import { VStack, Box, Text, ColorProps } from '@chakra-ui/react';
 import { format } from 'date-fns';
 import React from 'react';
-import { Booking } from '../interfaces/YCBMBookingDto';
+import { Booking } from '../interfaces/Bookings';
 
 export function BookingsList({
   bookings,
