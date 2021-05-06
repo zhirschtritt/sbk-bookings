@@ -6,6 +6,8 @@ import {
   useControllableState,
   VStack,
   Text,
+  Skeleton,
+  Stack,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import {
@@ -23,8 +25,13 @@ import useSWR from 'swr';
 import { BookingsList } from '../components/BookingsList';
 import { Booking } from '../interfaces/Bookings';
 
-const fetcher = async (url: string) => {
-  const res = await axios.get(url);
+interface BookedAndCancelledRes {
+  bookings: Booking[];
+  cancelled: Booking[];
+}
+
+const fetcher = async (url: string): Promise<BookedAndCancelledRes> => {
+  const res = await axios.get<BookedAndCancelledRes>(url);
   return res.data;
 };
 
@@ -43,12 +50,13 @@ const IndexPage = () => {
     defaultValue: (isThursday(now) ? now : nextThursday(now)).toISOString(),
   });
 
-  const { data, error } = useSWR<{
-    bookings: Booking[];
-    cancelled: Booking[];
-  }>(`/api/bookings/?date=${selectedDate}`, fetcher, {
-    refreshInterval: 5 * 60 * 1000, // 5 minutes
-  });
+  const { data, error } = useSWR<BookedAndCancelledRes>(
+    `/api/bookings/?date=${selectedDate}`,
+    fetcher,
+    {
+      refreshInterval: 5 * 60 * 1000, // 5 minutes
+    },
+  );
 
   if (error) {
     throw new Error(error);
@@ -71,9 +79,8 @@ const IndexPage = () => {
           ))}
         </Select>
       </Center>
-      {!data ? (
-        <Progress size="md" isIndeterminate margin="5" />
-      ) : (
+
+      <Skeleton isLoaded={!!data} startColor="green.500">
         <VStack align="stretch" width="full">
           <Center>
             <Container p="2" maxW="container.md">
@@ -99,7 +106,7 @@ const IndexPage = () => {
             )}
           </Center>
         </VStack>
-      )}
+      </Skeleton>
     </VStack>
   );
 };
