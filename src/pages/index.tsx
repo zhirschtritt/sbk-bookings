@@ -15,6 +15,7 @@ import {
   isThursday,
   nextThursday,
   startOfDay,
+  sub,
 } from 'date-fns';
 import React from 'react';
 import useSWR from 'swr';
@@ -32,7 +33,7 @@ const IndexPage = () => {
 
   const allThursdays = eachWeekOfInterval(
     {
-      start: now,
+      start: sub(now, { weeks: 1 }),
       end: add(now, { weeks: 4 }),
     },
     { weekStartsOn: 4 },
