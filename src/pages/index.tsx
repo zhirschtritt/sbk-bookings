@@ -2,12 +2,10 @@ import {
   Center,
   Container,
   Select,
-  Progress,
   useControllableState,
   VStack,
   Text,
   Skeleton,
-  Stack,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import {
@@ -40,14 +38,16 @@ const IndexPage = () => {
 
   const allThursdays = eachWeekOfInterval(
     {
-      start: sub(now, { weeks: 1 }),
+      start: sub(now, { days: 1 }),
       end: add(now, { weeks: 4 }),
     },
     { weekStartsOn: 4 },
   );
 
+  const defaultDate = (isThursday(now) ? now : nextThursday(now)).toISOString();
+
   const [selectedDate, setDate] = useControllableState({
-    defaultValue: (isThursday(now) ? now : nextThursday(now)).toISOString(),
+    defaultValue: defaultDate,
   });
 
   const { data, error } = useSWR<BookedAndCancelledRes>(
@@ -73,7 +73,7 @@ const IndexPage = () => {
           maxW="container.md"
         >
           {allThursdays.map((date) => (
-            <option key={date.getTime()} value={date.toISOString()}>
+            <option key={date.toISOString()} value={date.toISOString()}>
               {format(startOfDay(date), 'EEEE - LLL d, y')}
             </option>
           ))}
