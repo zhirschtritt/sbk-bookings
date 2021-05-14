@@ -68,8 +68,8 @@ const IndexPage = () => {
         <Select
           variant="flushed"
           paddingTop="1"
-          value={selectedDate}
-          onChange={(props) => setDate(props.target.value)}
+          defaultValue={defaultDate}
+          onChange={(e) => setDate(e.target.value)}
           maxW="container.md"
         >
           {allThursdays.map((date) => (

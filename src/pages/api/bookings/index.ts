@@ -70,7 +70,7 @@ export default async function handler(
       params: {
         jumpToDate: format(new Date(date), 'yyyy-LL-dd'),
         fields:
-          'startsAt,endsAt,createdAt,displayDurationShort,displayDurationFull,answers,answers.code,answers.string' +
+          'id,startsAt,endsAt,createdAt,displayDurationShort,displayDurationFull,answers,answers.code,answers.string' +
           ',cancelled,id,title',
       },
     },
