@@ -17,7 +17,7 @@ const username = process.env.YCMB_USER;
 const apiKey = process.env.YCMB_API_KEY;
 
 if (!accountId || !profileId || !username || !apiKey) {
-  throw new Error('Missing required YCMB account keys');
+  throw new Error('Missing required YCMB account key(s)');
 }
 
 function ycmbBookingToBooking(ycbmBooking: YCMBBookingDto): Booking {
@@ -44,16 +44,13 @@ function ycmbBookingToBooking(ycbmBooking: YCMBBookingDto): Booking {
   };
 }
 
-const baseUrl = 'https://api.youcanbook.me/v1/';
-const bookingsUrl = urljoin(
-  baseUrl,
-  accountId,
-  'profiles',
-  profileId,
-  'bookings',
-);
-
-const ycbmAxios = axios.create({
+const axiosInstance = axios.create({
+  baseURL: urljoin(
+    'https://api.youcanbook.me/v1/',
+    accountId,
+    'profiles',
+    profileId,
+  ),
   auth: {
     username,
     password: apiKey,
@@ -64,8 +61,8 @@ export default async function handler(
   { query: { date } }: NextApiRequest & { query: { date: string } },
   res: NextApiResponse,
 ) {
-  const { data: bookings } = await ycbmAxios.get<YCMBBookingDto[]>(
-    bookingsUrl,
+  const { data: bookings } = await axiosInstance.get<YCMBBookingDto[]>(
+    '/bookings',
     {
       params: {
         jumpToDate: format(new Date(date), 'yyyy-LL-dd'),
