@@ -17,7 +17,7 @@ import {
   startOfDay,
   sub,
 } from 'date-fns';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import useSWR from 'swr';
 
 import { BookingsList } from '../components/BookingsList';
@@ -34,7 +34,14 @@ const fetcher = async (url: string): Promise<BookedAndCancelledRes> => {
 };
 
 const IndexPage = () => {
-  const now = startOfDay(new Date());
+  const [now, setNow] = useState(startOfDay(new Date()));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(startOfDay(new Date()));
+    }, 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const allThursdays = eachWeekOfInterval(
     {
