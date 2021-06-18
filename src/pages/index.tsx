@@ -43,18 +43,18 @@ const IndexPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const defaultDate = isThursday(now) ? now : nextThursday(now);
+
   const allThursdays = eachWeekOfInterval(
     {
-      start: sub(now, { days: 1 }),
-      end: add(now, { weeks: 4 }),
+      start: sub(defaultDate, { weeks: 1 }),
+      end: add(defaultDate, { weeks: 3 }),
     },
     { weekStartsOn: 4 },
   );
 
-  const defaultDate = (isThursday(now) ? now : nextThursday(now)).toISOString();
-
   const [selectedDate, setDate] = useControllableState({
-    defaultValue: defaultDate,
+    defaultValue: defaultDate.toISOString(),
   });
 
   const { data, error } = useSWR<BookedAndCancelledRes>(
@@ -75,7 +75,7 @@ const IndexPage = () => {
         <Select
           variant="flushed"
           paddingTop="1"
-          defaultValue={defaultDate}
+          defaultValue={defaultDate.toISOString()}
           onChange={(e) => setDate(e.target.value)}
           maxW="container.md"
         >
